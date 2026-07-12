@@ -1,0 +1,6 @@
+# Normalize line endings so diffs are stable across agents and platforms
+* text=auto eol=lf
+*.md text eol=lf
+*.ndjson text eol=lf
+# Event logs are append-only; union merge keeps lines from both branches
+*.ndjson merge=union

@@ -1,0 +1,12 @@
+# Personal local settings, not part of the shared protocol
+.claude/settings.local.json
+
+# Local run logs referenced by reports; keep the directory, ignore contents
+.ai-collab/logs/*
+!.ai-collab/logs/.gitkeep
+
+# Independent test project with its own git repo (JOB-2026-07-05-001); never track here
+TestProject/
+
+# Playwright CLI session artifacts (snapshots/screenshots)
+.playwright-cli/
