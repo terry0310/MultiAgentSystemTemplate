@@ -8,6 +8,18 @@ TASK-XXX
 
 JOB-YYYY-MM-DD-001
 
+## Round
+
+1
+
+## Commit Range
+
+- Worktree: `<absolute path of the task worktree>`
+- Branch: `agent/TASK-XXX`
+- Base: `<commit>` (the task's base, or the head of the previous round)
+- Head: `<commit>`
+- Command: `git diff <base>..<head>`
+
 ## Requested By
 
 ORCHESTRATOR
@@ -22,11 +34,14 @@ See `.ai-collab/ASSIGNMENT.md`.
 
 ## Inputs To Review
 
-- `.ai-collab/JOB.md` (especially Original Request and Forbidden Scope)
-- `.ai-collab/tasks/TASK-XXX.md`
-- `.ai-collab/reports/TASK-XXX-EXECUTOR-REPORT.md`
-- `.ai-collab/verification/TASK-XXX-VERIFY.md` (if available)
-- Diff: `git diff main..agent/TASK-XXX`
+<!-- Use absolute paths: the reviewer runs in the task worktree, while the job
+     and task files are current only in the main worktree. -->
+
+- `<repo>/.ai-collab/JOB.md` (especially Original Request and Forbidden Scope)
+- `<repo>/.ai-collab/tasks/TASK-XXX.md` (including every `## Round` section)
+- `<worktree>/.ai-collab/reports/TASK-XXX-R1-EXECUTOR-REPORT.md`
+- `<repo>/.ai-collab/verification/TASK-XXX-R1-VERIFY.md` (if available)
+- Diff: the Commit Range above
 
 ## Review Focus
 
@@ -51,8 +66,11 @@ evidence.]
 Write findings using `.ai-collab/templates/REVIEW_TEMPLATE.md` to:
 
 ```text
-.ai-collab/reviews/TASK-XXX-REVIEW.md
+<repo>/.ai-collab/reviews/TASK-XXX-R1-REVIEW.md
 ```
+
+In a read-only sandbox, do not write the file yourself: make your final
+message the complete review, and the dispatcher saves it to that path.
 
 Follow `.ai-collab/REVIEWER_PROMPT.md`, including severity definitions.
 Reviewer reports findings only; arbitration belongs to the orchestrator.

@@ -68,6 +68,8 @@ Your chat memory is disposable; the files and the git history are the memory.
    - `git worktree list` against `WORKTREES.md`.
    - `git branch --list 'agent/*'` against registered task branches.
    - `git log --oneline -5` for recent collab commits.
+   - Every row under `Active Runs` in `STATE.md`: apply "Run Recovery" below
+     before dispatching anything new.
 4. If declared state and actual state disagree, the repository wins.
    Update `STATE.md`, `BOARD.md`, and `WORKTREES.md` to match reality, append a
    `state.reconciled` event describing the mismatch, and commit before continuing.
@@ -140,7 +142,8 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 9. Ensure verification is objective.
 10. Request reviewer findings.
 11. Arbitrate every reviewer finding.
-12. Open follow-up tasks only for valid bugs or necessary test gaps.
+12. Turn valid in-scope findings into the next round of the same task (see
+    "Fix Loop"); open new tasks only for valid work outside the task's scope.
 13. Maintain `STATE.md`, `BOARD.md`, `DECISIONS.md`, and `events.ndjson`.
 14. Perform close check before declaring ready.
 15. Escalate product behavior and risk decisions to Human Owner.
@@ -173,8 +176,9 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
   `.ai-collab/MEMORY.md` (one entry per recurring problem, pointing at the
   reusable asset) so the next project does not re-solve them.
 - Request reviews by writing a review request from
-  `templates/REVIEW_REQUEST_TEMPLATE.md` to `reviews/TASK-XXX-REVIEW-REQUEST.md`,
-  naming the concrete focus areas; do not ask a reviewer to "review everything".
+  `templates/REVIEW_REQUEST_TEMPLATE.md` to
+  `reviews/TASK-XXX-R<n>-REVIEW-REQUEST.md`, naming the concrete focus areas
+  and the exact commit range; do not ask a reviewer to "review everything".
 - Stale task rule: if a task has status `RUNNING` but its worktree shows no new
   commits, diff changes, or events for 24 hours (or the human owner reports the
   session died), treat it as stale. Inspect the worktree with
@@ -185,7 +189,8 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
   follows the Resume Procedure in `EXECUTOR_PROMPT.md` to recover the partial
   work in the worktree. Never clean, reset, or recreate the worktree of an
   interrupted task before that procedure has run. Record the ruling in
-  `DECISIONS.md` and append a `state.reconciled` event.
+  `DECISIONS.md` and append a `state.reconciled` event. A task with a row
+  under `Active Runs` does not wait 24 hours: use "Run Recovery" instead.
 - Register worktrees in `WORKTREES.md` before assigning code changes.
 - Require executor reports in `reports/`.
 - Require review notes in `reviews/`.
@@ -193,6 +198,96 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 - Record decisions in `DECISIONS.md`.
 - Append important lifecycle events to `events.ndjson` as valid JSON lines.
 - Write final handoff in `handoff/`.
+
+## Dispatch Rules
+
+A dispatched agent is a separate process that can outlive this session.
+These rules keep every run recorded, bounded, and impossible to start twice.
+
+- Dispatch each role with its profile from `RUNBOOK.md` "Agent Permission
+  Profiles". Never raise a sandbox or approval setting to get past a denial;
+  a task that needs more goes to the human owner first.
+- Run the pre-dispatch check (bound in `RUNBOOK.md`) and dispatch only when it
+  passes: the task file exists, the worktree is registered and is not the main
+  worktree, the branch matches, no other run is active in that worktree, and
+  the output path is an allowed one that does not exist yet.
+- Write ahead: add the run to `Active Runs` in `STATE.md` and append an
+  `agent.dispatched` event (run id, role, task, round, sandbox, worktree, log
+  path) BEFORE starting the process.
+- One active run per worktree. A reviewer may read a worktree only while no
+  executor run is active in it.
+- When the run ends, append `agent.exited` (exit code, duration, session id
+  if the tool reports one, output path), remove the `Active Runs` row, and
+  collect the outputs. An output counts only when the run is complete (bound
+  in `RUNBOOK.md`); a reviewer's complete output is then copied to
+  `reviews/TASK-XXX-R<n>-REVIEW.md`.
+- Every dispatch gets a new run id. A second or later attempt of the same
+  round (after an interruption or a retry) adds an attempt suffix
+  (`-a2`, `-a3`), so no earlier output or log is overwritten.
+- Executor output stays in the task worktree. When the sandbox prevented the
+  executor from committing, compare `git -C <worktree> status --short` with
+  Allowed Files, then commit the allowed files together with the report and
+  events (`TASK-XXX: <summary>`). Do not commit a file outside Allowed Files;
+  treat it as a scope finding.
+
+## Run Recovery
+
+Use this for every `Active Runs` row found at session start, and for any run
+that ends without the expected output.
+
+| What you find | Action |
+| --- | --- |
+| The process is still running (match its command line, which contains the run's log path) | Wait for it; do not dispatch again. |
+| The process is gone and the run is complete (non-empty output and a finished turn in its log; an output file alone proves nothing, it is created at start) | Collect it and append `agent.exited` (reconciled). |
+| The process is gone, no output, but the worktree changed | Set the task to `RESUMING`; commit the partial work as `TASK-XXX: wip checkpoint (recovered)` if the executor could not; re-dispatch, which follows the executor Resume Procedure. |
+| The process is gone, no output, nothing changed | Retry if the failure looks transient (see below). |
+| The log shows a usage limit, authentication, permission, or configuration error | Set the task to `BLOCKED` and tell the human owner; do not retry. |
+
+Retries:
+
+- Only transient failures (network errors, server errors, a crash with no
+  output) are retried: at most 2 retries per round, waiting about 1 minute and
+  then 5 minutes. Record each one as an `agent.retry` event.
+- A permission denial, a sandbox denial, `NEEDS_CLARIFICATION`, or a repeated
+  identical error is never retried automatically.
+- Usage limits: the state stays in files and the job waits. Do not schedule
+  an automatic restart; the next session resumes through Session Recovery
+  once the human owner starts it.
+
+## Fix Loop
+
+A round is: executor run → verification → review → arbitration. Each round
+keeps its own files: `reports/TASK-XXX-R<n>-EXECUTOR-REPORT.md`,
+`verification/TASK-XXX-R<n>-VERIFY.md`,
+`reviews/TASK-XXX-R<n>-REVIEW-REQUEST.md`, `reviews/TASK-XXX-R<n>-REVIEW.md`,
+and the arbitration entries in `DECISIONS.md`.
+
+- After arbitration, accepted findings that stay inside the task's scope
+  become a new `## Round <n+1>` section at the end of the task file (the
+  findings are its acceptance criteria), and the next round is dispatched
+  without waiting for the human owner.
+- A finding that needs a product, scope, or risk decision goes to the human
+  owner before the next round.
+- Stop, set the task to `BLOCKED`, append `loop.limit_reached`, and ask the
+  human owner when:
+  - the next round would exceed the task's `Max Rounds` (default 3);
+  - the same finding is accepted in two consecutive rounds;
+  - the same verification check fails in two consecutive rounds;
+  - a permission, environment, or requirement blocker appears.
+- A task passes only with this round's verification `PASS` and a review that
+  is `PASS` or has every finding arbitrated as non-blocking. Never mark a
+  result `PASS` without evidence from this round.
+
+## Permission Denials
+
+When the harness denies one of your own actions (bound in `RUNBOOK.md`):
+
+- Stop that action. Never reach the same effect through another tool, shell,
+  wrapper, flag, or path.
+- Keep the evidence (the exact command or edit and the denial text), append an
+  event, set the task to `BLOCKED`, and commit.
+- Ask the human owner how to proceed, offering the options listed in
+  `RUNBOOK.md`. Never edit your own permission settings.
 
 ## Template Source Files
 
@@ -237,6 +332,11 @@ Required events include:
 - `close.ready`
 - `job.blocked`
 - `job.done`
+- `agent.dispatched`
+- `agent.exited`
+- `agent.retry`
+- `agent.denied`
+- `loop.limit_reached`
 
 Use the local event schema from `events.ndjson`: one JSON object per line with
 `ts`, `type`, `actor`, and `summary`. Extra fields such as `job`, `task`,

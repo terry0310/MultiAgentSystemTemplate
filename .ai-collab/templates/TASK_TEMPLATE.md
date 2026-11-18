@@ -18,7 +18,20 @@ Per ASSIGNMENT.md
 
 ## Status
 
-TODO / ASSIGNED / RUNNING / BLOCKED / REPORT_READY / REVIEW_PENDING / VERIFY_PENDING / DONE
+TODO / ASSIGNED / RUNNING / RESUMING / BLOCKED / REPORT_READY / REVIEW_PENDING / VERIFY_PENDING / DONE
+
+## Round
+
+<!-- Current round. Later rounds are appended as "## Round N" sections at the
+     end of this file, with the accepted findings as acceptance criteria. -->
+
+1
+
+## Max Rounds
+
+<!-- Fix-loop limit (ORCHESTRATOR_PROMPT.md "Fix Loop"). -->
+
+3
 
 ## Branch
 
@@ -52,6 +65,16 @@ agent/TASK-XXX
 
 - None
 
+## Sandbox / Permissions
+
+<!-- Profile from RUNBOOK.md "Agent Permission Profiles". Changing it needs
+     human owner approval. -->
+
+- Executor sandbox: workspace-write
+- Network: off
+- Extra writable paths: none
+- Host-only verification (run by VERIFIER from the orchestrator's terminal): none
+
 ## Requirements
 
 - Do only this task.
@@ -64,6 +87,8 @@ agent/TASK-XXX
 - Do not merge.
 - Do not rebase.
 - Stop and report if requirements are unclear.
+- If the sandbox denies an action, record it and do not work around it.
+- Use only the skills listed under Relevant Skills.
 
 ## Acceptance Criteria
 
@@ -90,15 +115,17 @@ agent/TASK-XXX
 - [ ] Check git diff --stat.
 - [ ] Write executor report.
 - [ ] Update event log.
-- [ ] Mark status as `REPORT_READY`.
+- [ ] Set the report status to `REPORT_READY`.
 
 ## Output Report
 
-Write report to:
+Write the report inside your worktree to:
 
 ```text
-.ai-collab/reports/TASK-XXX-EXECUTOR-REPORT.md
+.ai-collab/reports/TASK-XXX-R1-EXECUTOR-REPORT.md
 ```
+
+Later rounds use `R2`, `R3`, and so on.
 
 ## Report Must Include
 

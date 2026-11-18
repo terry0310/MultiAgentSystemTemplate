@@ -71,7 +71,7 @@ worktrees inside one job), not at the job level.
 6. Verifier records objective checks in `verification/`.
 7. Reviewer writes findings in `reviews/`.
 8. Orchestrator arbitrates findings and records decisions in `DECISIONS.md`.
-9. Valid issues become new narrow tasks.
+9. Valid findings inside the task's scope become the next round of the same task (`ORCHESTRATOR_PROMPT.md` "Fix Loop"); other valid work becomes a new narrow task.
 10. Orchestrator performs a close check and writes final handoff in `handoff/`.
 11. Human owner accepts or rejects the final result.
 
@@ -108,7 +108,7 @@ worktrees inside one job), not at the job level.
 ### 4. Verification
 
 - Verifier runs objective checks from the executor worktree or from the main worktree after merge, depending on the task.
-- Verifier writes `verification/TASK-XXX-VERIFY.md` from `templates/VERIFY_TEMPLATE.md`.
+- Verifier writes `verification/TASK-XXX-R<n>-VERIFY.md` (one file per round) from `templates/VERIFY_TEMPLATE.md`.
 - Unexecuted checks must remain `NOT RUN`; failed checks must include relevant logs or log paths.
 - Append `verification.passed`, `verification.failed`, or another specific verification event.
 
@@ -124,10 +124,11 @@ worktrees inside one job), not at the job level.
 ### 6. Arbitration And Fix Loop
 
 - Orchestrator records decisions in `DECISIONS.md` for every reviewer finding.
-- Valid bugs or required test gaps become new narrow tasks.
+- Valid bugs or required test gaps inside the task's scope become the next round of the same task: a `## Round <n+1>` section in the task file, on the same branch and worktree.
+- Valid work outside the task's scope becomes a new narrow task, with human owner approval when it expands the job's scope.
 - False positives, style-only items, out-of-scope findings, or deferred risks are recorded with reasons.
 - Human owner decides product behavior, scope expansion, and risk acceptance.
-- Repeat executor, verification, review, and arbitration until close criteria are met or the job is blocked.
+- Repeat executor, verification, review, and arbitration until close criteria are met or the job is blocked, within the round limit and stop conditions of "Fix Loop" in `ORCHESTRATOR_PROMPT.md`.
 
 ### 7. Close Check
 
@@ -309,6 +310,11 @@ Recommended event types:
 - `close_check.started`
 - `close.ready`
 - `handoff.completed`
+- `agent.dispatched`
+- `agent.exited`
+- `agent.retry`
+- `agent.denied`
+- `loop.limit_reached`
 
 ## Conflict Handling
 

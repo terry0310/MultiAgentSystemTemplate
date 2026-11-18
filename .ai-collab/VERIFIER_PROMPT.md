@@ -35,8 +35,8 @@ actually pass when actually run.
 ## Output
 
 Fill `.ai-collab/templates/VERIFY_TEMPLATE.md` completely and write it to
-`.ai-collab/verification/TASK-XXX-VERIFY.md`. Append a `verification.passed`
-or `verification.failed` event.
+`.ai-collab/verification/TASK-XXX-R<n>-VERIFY.md` (one file per round of the
+task). Append a `verification.passed` or `verification.failed` event.
 
 ## Must Not
 

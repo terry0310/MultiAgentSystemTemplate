@@ -5,6 +5,10 @@ This repository uses the file-based multi-agent protocol in `.ai-collab/`.
 ## Before doing ANY work in this repo
 
 1. Read `.ai-collab/STATE.md` to learn the current job, phase, and next expected action.
+   - If you were started with a role bootstrap that names a role other than
+     ORCHESTRATOR (for example "You are the EXECUTOR for TASK-001"), do not run
+     Session Recovery, onboarding, or intake: go to step 2 and follow that
+     role's prompt contract.
    - If it shows an in-progress job, you are resuming interrupted work. Follow the
      Session Recovery procedure in `.ai-collab/ORCHESTRATOR_PROMPT.md` before acting.
    - If it shows `NO ACTIVE JOB` and the human has not yet stated a request,
