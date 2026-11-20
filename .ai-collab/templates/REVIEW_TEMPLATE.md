@@ -20,9 +20,9 @@ REVIEW_READY / BLOCKED
 
 - `.ai-collab/JOB.md`
 - `.ai-collab/tasks/TASK-XXX.md`
-- `.ai-collab/reports/TASK-XXX-EXECUTOR-REPORT.md`
-- `git diff main..agent/TASK-XXX`
-- `.ai-collab/verification/TASK-XXX-VERIFY.md`
+- `.ai-collab/reports/TASK-XXX-R<n>-EXECUTOR-REPORT.md`
+- `git diff <base>..<head>` (the commit range from the review request)
+- `.ai-collab/verification/TASK-XXX-R<n>-VERIFY.md`
 
 ## Review Scope
 

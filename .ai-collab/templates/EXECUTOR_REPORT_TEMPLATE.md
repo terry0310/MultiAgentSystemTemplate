@@ -20,9 +20,21 @@ EXECUTOR
 
 [path]
 
+## Round
+
+1
+
 ## Status
 
 REPORT_READY / BLOCKED / NEEDS_CLARIFICATION
+
+## Commit Status
+
+Committed by executor / Left uncommitted for the orchestrator (git writes denied) / N/A
+
+## Sandbox Denials
+
+None / [exact command and exact error for each denied action]
 
 ## Summary
 

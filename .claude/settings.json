@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PermissionDenied": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/log-permission-denied.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

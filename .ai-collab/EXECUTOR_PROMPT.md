@@ -41,9 +41,11 @@ work, not to redo it.
 
 1. Confirm worktree and branch as in Startup Checks; the clean-status
    requirement does not apply.
-2. If there are uncommitted changes, commit them as-is before anything else:
-   `TASK-XXX: wip checkpoint (recovered)`. Never discard, stash, or overwrite
-   them.
+2. If there are uncommitted changes, keep them. Commit them as-is before
+   anything else (`TASK-XXX: wip checkpoint (recovered)`) when your
+   environment allows git writes; when it denies them (see Sandbox Rules),
+   leave them in place and list them in your report. Never discard, stash, or
+   overwrite them.
 3. Rebuild context from files:
    - The task file, especially Acceptance Criteria and Allowed Files.
    - `git log --oneline` on the task branch for previous commits.
@@ -76,16 +78,34 @@ work, not to redo it.
   acceptance criterion), commit on your branch with `TASK-XXX: wip <summary>`.
   An interruption then costs at most one milestone, and a resuming session can
   read progress from the branch history instead of guessing.
+- If git writes are denied (for example `index.lock: Permission denied`
+  inside a sandbox), do not commit at all: leave every change in the worktree,
+  list each changed file in your report, and the orchestrator commits them.
+- Follow only the skills listed in your task file. Ignore other skills your
+  tool happens to offer.
+
+## Sandbox Rules
+
+You may be running in a sandbox that lets you write only inside your assigned
+worktree. Its limits are part of your contract, not an obstacle to solve.
+
+- If an action is denied (a write outside the worktree, network access, git
+  metadata, an escalation request), stop that action. Do not try another
+  tool, shell, path, or flag to reach the same effect.
+- Record the exact command and the exact error in your report.
+- If the task cannot be finished without the denied action, finish what you
+  can and report `BLOCKED` with the denial as the blocker.
 
 ## Completion
 
 1. Fill `.ai-collab/templates/EXECUTOR_REPORT_TEMPLATE.md` completely and write
-   it to the report path named in your task file. If a field does not apply,
-   write `N/A` with a reason.
+   it to the report path named in your task file, INSIDE YOUR OWN WORKTREE. If
+   a field does not apply, write `N/A` with a reason.
 2. Append your lifecycle events (`task.started`, `files.modified`,
    `test.passed`/`test.failed`, `report.ready`) to `.ai-collab/events.ndjson`
-   INSIDE YOUR OWN WORKTREE and commit them on your branch. Do not write to the
-   main worktree's event log; the merge combines them.
+   INSIDE YOUR OWN WORKTREE and commit them on your branch when git writes are
+   allowed. Do not write to the main worktree's event log; the merge combines
+   them.
 3. Set your task file status to `REPORT_READY` (or `BLOCKED` /
    `NEEDS_CLARIFICATION`). If the task file is outside your worktree and you
    cannot modify it (for example, it lives in another repository's main

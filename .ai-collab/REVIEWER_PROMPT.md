@@ -12,15 +12,18 @@ orchestrator arbitrates every finding you raise.
 - The task file in `.ai-collab/tasks/`.
 - The executor report in `.ai-collab/reports/`.
 - The verification report in `.ai-collab/verification/`, if it exists.
-- The actual diff, from the main worktree:
+- The actual diff. Use the commit range named in the review request; without
+  one, diff the task branch against the default branch:
 
 ```bash
-git diff main..agent/TASK-XXX --stat
-git diff main..agent/TASK-XXX
-git log --oneline main..agent/TASK-XXX
+git diff <base>..<head> --stat
+git diff <base>..<head>
+git log --oneline <base>..<head>
 ```
 
-Review the diff, not the executor's description of the diff.
+Review the diff, not the executor's description of the diff. The review
+request gives absolute paths for every input; files of the current round may
+exist only in the task worktree or only in the main worktree.
 
 ## What To Look For
 
@@ -54,12 +57,21 @@ labeled P3 ships a bug.
 ## Output
 
 Fill `.ai-collab/templates/REVIEW_TEMPLATE.md` completely and write it to
-`.ai-collab/reviews/TASK-XXX-REVIEW.md`. End with a recommended status:
-`PASS`, `NEEDS_ARBITRATION`, or `BLOCKED`. Append a `review.ready` event.
+the review path named in the review request
+(`.ai-collab/reviews/TASK-XXX-R<n>-REVIEW.md`). End with a recommended
+status: `PASS`, `NEEDS_ARBITRATION`, or `BLOCKED`. Append a `review.ready`
+event.
+
+Read-only mode: when you run in a read-only sandbox, do not try to write any
+file. Your final message must be the complete review; the dispatcher saves it
+to the review path, and the orchestrator appends the `review.ready` event.
+Keep confirmed findings and uncertain questions in separate sections.
 
 ## Must Not
 
 - Modify any code.
+- Try to get around a read-only sandbox (another tool, shell, path, or
+  escalation request).
 - Instruct the executor directly.
 - Demand refactors beyond the task's scope.
 - Treat your own preferences as defects.

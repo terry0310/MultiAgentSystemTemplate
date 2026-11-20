@@ -36,14 +36,17 @@ Do not assume availability from a previous job.
 
 ## Role Assignment
 
-| Role | Assigned Agent | Model / Effort | Invocation | Reason |
-| --- | --- | --- | --- | --- |
-| HUMAN_OWNER | Human | N/A | N/A | Final product acceptance. |
-| ORCHESTRATOR | TBD | TBD | TBD | Coordinates task flow, scope, arbitration, and handoff. |
-| EXECUTOR | TBD | TBD | TBD | Implements assigned task contracts. |
-| REVIEWER | TBD | TBD | TBD | Reviews executor output and records findings. |
-| VERIFIER | Terminal / CI | N/A | Direct commands | Objective checks. |
-| SCRIBE | TBD | TBD | TBD | Maintains state, decisions, events, and handoff. |
+| Role | Assigned Agent | Model / Effort | Sandbox / Approval | Invocation | Reason |
+| --- | --- | --- | --- | --- | --- |
+| HUMAN_OWNER | Human | N/A | N/A | N/A | Final product acceptance. |
+| ORCHESTRATOR | TBD | TBD | Harness permission system | TBD | Coordinates task flow, scope, arbitration, and handoff. |
+| EXECUTOR | TBD | TBD | TBD (default `workspace-write` / `never`) | TBD | Implements assigned task contracts. |
+| REVIEWER | TBD | TBD | TBD (default `read-only` / `never`) | TBD | Reviews executor output and records findings. |
+| VERIFIER | Terminal / CI | N/A | Orchestrator's terminal | Direct commands | Objective checks. |
+| SCRIBE | TBD | TBD | TBD | TBD | Maintains state, decisions, events, and handoff. |
+
+Sandbox defaults come from `RUNBOOK.md` "Agent Permission Profiles"; any
+other value needs human owner approval recorded in `DECISIONS.md`.
 
 ## Assignment Constraints
 

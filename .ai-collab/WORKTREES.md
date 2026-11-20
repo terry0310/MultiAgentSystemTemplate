@@ -93,6 +93,12 @@ Use executor worktrees for:
 
 Executor agents must stay inside their assigned worktree.
 
+A sandboxed executor's writable area is exactly the folder it was started in,
+so always start it with the task worktree as its working directory, never the
+main worktree. In such a sandbox the executor usually cannot write git
+metadata; the orchestrator then commits its changes (see "Dispatch Rules" in
+`ORCHESTRATOR_PROMPT.md`).
+
 Executor agents must not:
 
 - Switch branches.
@@ -117,7 +123,7 @@ Reviewers should inspect:
 Reviewer findings go to:
 
 ```text
-.ai-collab/reviews/TASK-XXX-REVIEW.md
+.ai-collab/reviews/TASK-XXX-R<n>-REVIEW.md
 ```
 
 Reviewers must not directly modify code.
@@ -171,7 +177,7 @@ npm run typecheck
 Verification results go to:
 
 ```text
-.ai-collab/verification/TASK-XXX-VERIFY.md
+.ai-collab/verification/TASK-XXX-R<n>-VERIFY.md
 ```
 
 Verifiers must not mark unexecuted checks as `PASS`.
@@ -188,12 +194,10 @@ agent/TASK-002
 agent/TASK-003
 ```
 
-Fix branches created from review findings:
-
-```text
-agent/TASK-001-fix-001
-agent/TASK-001-fix-002
-```
+Review findings inside a task's scope are fixed as the next round on the same
+branch and worktree (`ORCHESTRATOR_PROMPT.md` "Fix Loop"); there are no
+separate fix branches. Valid work outside the task's scope becomes a new task
+with its own branch, for example `agent/TASK-004`.
 
 Avoid reviewer or verifier branches unless the human owner explicitly asks for them.
 
@@ -411,7 +415,8 @@ Before an executor reports completion:
 - [ ] `git diff --stat` was checked.
 - [ ] Executor report was written.
 - [ ] Event log was updated.
-- [ ] Changes were committed if the task requires a commit.
+- [ ] Changes were committed if the task requires a commit, or, when git
+      writes are denied, left in the worktree and listed in the report.
 - [ ] Remaining risks were documented.
 
 Recommended commands:
@@ -561,28 +566,31 @@ Agents must not modify dependency lockfiles unless the task explicitly allows it
 
 ## Reporting Back To Main Worktree
 
-Executors should write report files back to the main control worktree whenever
-possible. Report filenames are unique per task and role, so there is no write
-contention.
+Executors write their report and events inside their OWN worktree. A
+sandboxed executor can write nowhere else, and the files travel with the task
+branch. Report filenames are unique per task, round and role, so there is no
+write contention.
 
 Example:
 
 ```text
-../project/.ai-collab/reports/TASK-001-EXECUTOR-REPORT.md
+../project.TASK-001/.ai-collab/reports/TASK-001-R1-EXECUTOR-REPORT.md
+../project.TASK-001/.ai-collab/events.ndjson
 ```
 
-Events are the exception: executors append events inside their own worktree
-(see Event Logging below), never to the main worktree's `events.ndjson`.
+The orchestrator reads them from the worktree and commits them with the
+task's changes when the executor could not commit; the merge brings them to
+the main worktree.
 
-Reviewers and verifiers also write to the main control worktree:
+Reviews and verification reports belong to the main control worktree:
 
 ```text
-../project/.ai-collab/reviews/TASK-001-REVIEW.md
-../project/.ai-collab/verification/TASK-001-VERIFY.md
+../project/.ai-collab/reviews/TASK-001-R1-REVIEW.md
+../project/.ai-collab/verification/TASK-001-R1-VERIFY.md
 ```
 
-If writing directly to the main worktree is unsafe, write inside the task
-worktree first and ask the orchestrator to collect it.
+A reviewer in a read-only sandbox does not write this file itself: its final
+message is the review, and the dispatcher saves it to the review path.
 
 ## Event Logging
 

@@ -54,6 +54,15 @@ Capture the human owner's request in `JOB.md` using `INTAKE.md`.
 
 - None
 
+## Active Runs
+
+<!-- One row per dispatched agent process without an agent.exited event yet.
+     Add the row BEFORE starting the process (ORCHESTRATOR_PROMPT.md
+     "Dispatch Rules"); write "None" when there is no active run.
+     Columns: | Run | Role | Task / Round | Worktree | Sandbox | Started | Log | -->
+
+None
+
 ## Latest Evidence
 
 - None
