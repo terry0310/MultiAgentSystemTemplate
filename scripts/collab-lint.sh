@@ -7,11 +7,11 @@
 #   - corrupt / non-JSON lines or missing required fields in events.ndjson
 #   - STATE.md phase or overall status outside the allowed value lists
 #
-# Usage: scripts/collab-lint.sh        (run from anywhere inside the repo)
+# Usage: scripts/collab-lint.sh [folder] (default: git rev-parse --show-toplevel)
 # Exit:  0 clean (warnings allowed), 1 on any error.
 set -euo pipefail
 
-ROOT="$(git rev-parse --show-toplevel)"
+ROOT="${1:-$(git rev-parse --show-toplevel)}"
 cd "$ROOT"
 
 ERRORS=0
@@ -22,7 +22,7 @@ warn() { echo "warn:  $*"; }
 BOARD=".ai-collab/BOARD.md"
 if [ -f "$BOARD" ]; then
   # section + first-cell task id for every data row (skip header/separator)
-  awk '
+  BOARD_TASKS=$(awk '
     /^## /   { section = substr($0, 4); next }
     /^\| *-/ { next }                       # separator row
     /^\| Task \|/ || /^\| Job \|/ { next }  # header row
@@ -35,19 +35,20 @@ if [ -f "$BOARD" ]; then
         print id "\t" section
       }
     }
-  ' "$BOARD" | sort -u > /tmp/collab-lint-board.$$
+  ' "$BOARD" | sort -u)
 
   # duplicate: same task id in more than one section
-  cut -f1 /tmp/collab-lint-board.$$ | sort | uniq -d | while read -r dup; do
-    secs=$(grep "^${dup}	" /tmp/collab-lint-board.$$ | cut -f2 | paste -sd ", " -)
-    echo "ERROR: BOARD.md: ${dup} appears in multiple sections: ${secs}"
-  done
-  DUPS=$(cut -f1 /tmp/collab-lint-board.$$ | sort | uniq -d | wc -l)
-  ERRORS=$((ERRORS + DUPS))
-  rm -f /tmp/collab-lint-board.$$
+  DUPS=$(printf '%s\n' "$BOARD_TASKS" | cut -f1 | sort | uniq -d)
+  if [ -n "$DUPS" ]; then
+    printf '%s\n' "$DUPS" | while read -r dup; do
+      secs=$(printf '%s\n' "$BOARD_TASKS" | awk -F '\t' -v id="$dup" '$1 == id {print $2}' | paste -sd ", " -)
+      echo "ERROR: BOARD.md: ${dup} appears in multiple sections: ${secs}"
+    done
+    ERRORS=$((ERRORS + $(printf '%s\n' "$DUPS" | wc -l)))
+  fi
 
   # malformed rows: pipe count differs from the section header's pipe count
-  awk '
+  ROW_ERRORS=$(awk '
     /^## /  { header = "" ; next }
     /^\|/ {
       n = gsub(/\|/, "|")
@@ -56,12 +57,14 @@ if [ -f "$BOARD" ]; then
       if (n != header)
         printf "ERROR: BOARD.md line %d: %d cells but section header has %d\n", NR, n-1, header-1
     }
-  ' "$BOARD" | tee /tmp/collab-lint-rows.$$
-  ERRORS=$((ERRORS + $(wc -l < /tmp/collab-lint-rows.$$)))
-  rm -f /tmp/collab-lint-rows.$$
+  ' "$BOARD")
+  if [ -n "$ROW_ERRORS" ]; then
+    printf '%s\n' "$ROW_ERRORS"
+    ERRORS=$((ERRORS + $(printf '%s\n' "$ROW_ERRORS" | wc -l)))
+  fi
 
   # leftover placeholder rows (all-empty first cell) — template residue
-  grep -n '^| *|' "$BOARD" | while read -r line; do
+  awk '/^\| *\|/ {printf "%d:%s\n", NR, $0}' "$BOARD" | while read -r line; do
     warn "BOARD.md placeholder row (template residue?): ${line}"
   done
 else
@@ -73,7 +76,7 @@ EVENTS=".ai-collab/events.ndjson"
 if [ -f "$EVENTS" ]; then
   BAD=$(node -e '
     const fs = require("fs");
-    const lines = fs.readFileSync(process.argv[1], "utf8").split(/\r?\n/);
+    const lines = fs.readFileSync(process.argv[1], "utf8").replace(/^\uFEFF/, "").split(/\r?\n/);
     let bad = 0;
     lines.forEach((line, i) => {
       if (!line.trim()) return;
