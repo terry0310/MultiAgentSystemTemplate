@@ -1,31 +1,118 @@
 # UI policy
 
-## Grant and ownership
+This policy applies only to a task whose `Workflow` field selects `UI`, after the human owner has approved a UI grant at intake. Every other task follows the standard workflow. A job can contain both kinds of task.
 
-Use this policy when the task explicitly selects `UI` and the human owner has approved the UI delegation at intake. An absent selection uses the standard workflow. Record the grant in [UI-DECISIONS.md](UI-DECISIONS.md) and reference its ID in the job and task. The grant identifies the design baseline, target platforms and inputs, delegated choices, required platforms for acceptance and any design files the task may edit. The human owner retains final acceptance and may supersede a decision.
+UI work produces many small defects, and fixing one interaction often exposes the next one in an adjacent state. The policy therefore lets the orchestrator decide routine UI details itself, counts repairs per defect instead of per task, and finds related defects early with an interaction matrix.
 
-For a new screen, the grant can cover loading, empty, error and focus states within the approved direction and component library. Assign one writer per shared design file. All other roles read the same revision. With a read-only baseline, capture its revision or hash before and after work.
+## Grant
 
-## Triage by the orchestrator
+The human owner approves one grant at intake, for the job or for one UI task. The orchestrator records it as a `UD-####` row in [UI-DECISIONS.md](UI-DECISIONS.md) and cites that ID in `JOB.md` and in every UI task. The grant states:
 
-| Class | Authority and evidence |
+| Field | Content |
 | --- | --- |
-| A1: established behavior | Restore a documented rule or approved design. Cite its section, node or UI-ID and a reproduction. |
-| A2: platform convention | Fill a gap when official target-platform guidance directly covers the case, or two independent implementations agree. Cite the sources and the platform. |
-| A3: local choice | Decide a reversible detail consistent with existing behavior and the grant. Describe the precedent, affected surface and how to reverse it. |
-| A4: test or evidence | Repair a fixture, add a regression or improve evidence within the contract. Preserve the agreed acceptance criterion. |
-| B: human decision | Batch questions involving scope, cross-screen behavior, shared design changes outside the grant, conflicts with an approved rule, security, privacy, licensing, risk acceptance or irreversible actions. Treat uncertain authority as B. |
+| Goal | The product goal of the UI work. |
+| Design baseline | The approved design files or specification, with their revision or hash. |
+| Platforms and inputs | Target platforms and input methods, for example keyboard, each mouse button, wheel, touch, IME and assistive technology. |
+| Required platforms | Platforms that need current evidence before close. Every other platform is optional. |
+| Delegated choices | What the orchestrator may decide alone (classes A1-A4 below), and any exclusions. |
+| Design-file writer | The one agent allowed to edit each shared design file, if edits are allowed at all. |
+| OS-level input | Whether agents may send real mouse and keyboard input on the operator's machine, which windows they may target, and whether to notify the human before each session. |
+| Human-only checks | Checks that only a person can perform, for example IME composition, touch, physical gestures or a screen reader, and how the human returns the results. |
+| Checkpoint interval | Number of rounds between checkpoints. Default: 3. |
 
-The executor reports a gap to the orchestrator. The orchestrator rules on A items and records the evidence. Where conventions disagree, use A3 only if all its conditions hold. For B, record the pending question and options, request the human owner's ruling, and continue independent authorized work. Use the existing permission-denial and blocker procedures. A classification grants no additional tool or file permissions.
+The human owner keeps final acceptance and can supersede any UI decision. For a new screen, the grant can cover loading, empty, error and focus states within the approved direction and component library.
 
-## Decision record and handoff
+Each shared design file has one writer. All other roles read the same revision. For a read-only baseline, record its revision or hash before and after each round.
 
-The orchestrator or assigned scribe appends each UI ruling, including deferrals and human overrides, to the UI ledger. A general scope or permissions approval stays in `DECISIONS.md` with only the related UI-ID. Cite IDs in the task contract, reports and handoff so readers can retrieve the design rationale. Keep defect counts in the task under its Round sections.
+## Triage
+
+The executor reports a specification gap to the orchestrator and does not decide it. The orchestrator classifies every gap and every finding:
+
+| Class | The orchestrator may decide when | Evidence to record |
+| --- | --- | --- |
+| A1: established behavior | A documented rule or approved design already says what should happen. | The section, design node or UD-ID, and a reproduction. |
+| A2: platform convention | Official guidance for the target platform covers the case directly, or two independent implementations agree. | The sources, what each says, and the platform. |
+| A3: local choice | The detail is reversible, consistent with existing behavior and inside the grant. | The precedent, the affected surface, and how to reverse it. |
+| A4: test or evidence | A fixture, regression test or evidence gap can be fixed without changing an agreed acceptance criterion. | The test or evidence added. |
+| B: human decision | The item involves scope, behavior across screens, a shared design change outside the grant, a conflict with an approved rule, security, privacy, licensing, risk acceptance or an irreversible action. | The question and its options. |
+
+- When sources disagree, the item can still be A3, but only if every A3 condition holds. Otherwise it is B.
+- When the class is uncertain, treat the item as B.
+- For B, record the question and options as a `pending` UD row, ask the human owner in one batch, and continue the work that does not depend on the answer.
+- A class never grants extra tool or file permissions. Permission denials and blockers follow the standard procedures.
+
+## Decision record
+
+All UI content goes to [UI-DECISIONS.md](UI-DECISIONS.md):
+
+- the grant;
+- every UI ruling: A items decided by the orchestrator, and B items decided by the human owner;
+- the UI arbitration of every review and verification finding;
+- checkpoint rulings, deferrals and human overrides;
+- the results of human-only checks.
+
+`DECISIONS.md` keeps only general governance, such as scope approval, permissions, risk acceptance and merges, and cites the related UD-IDs. Task contracts, reports, reviews and the handoff cite UD-IDs so readers can find the rationale. Each task keeps its defect ledger (IDs, counts, status and regression tests) in the task file.
+
+## Planning a UI task
+
+1. Describe each issue as: starting state, user input, observed outcome, expected outcome, and what the user can do next.
+2. Write a state and transition inventory of the affected components. The [interaction-design](skills/interaction-design/SKILL.md) skill's state inventory template is a good format.
+3. Expand the inventory into an **interaction matrix**: each relevant state against each input in the grant. Inputs include keyboard keys (for example Esc, Tab, Shift+Tab, arrows and Enter), each mouse button, the wheel, an overlay or menu being open, focus loss and window switch, and IME. Mark every cell as automated test, real-input check, human-only, or not applicable.
+4. When a cell has no documented rule and needs a convention, assign research ([research guide](skills/ux-autopilot/references/research.md)), then triage the result.
+5. Give each confirmed defect a stable ID tied to its precondition, user input and violated outcome. Reuse the review finding ID when there is one. A defect found while fixing another records that one as its parent.
+6. In the task, record: the grant UD-ID, where the inventory and matrix are, the defect ledger, the checkpoint interval, and the T1 and T2 verification commands.
 
 ## UI repair loop
 
-1. Give each confirmed defect a stable ID tied to its precondition, user input and violated outcome. Reuse a review finding ID if available. Record the platform, related finding or parent defect and acceptance check in the task.
-2. Use the existing numbered rounds for dispatch, artifacts, verification and arbitration. Batch compatible in-scope defects in the same task worktree. At planning, agree a finite task budget and a checkpoint (round or time). At a checkpoint the orchestrator reviews progress and evidence, closes or defers permissible findings, or batches more work within the remaining authorization. Only an extension of an exhausted authorized budget or a change of scope needs human approval.
-3. Start a defect's repair count at 1 when its first fix is dispatched. Increment once when the same acceptance check still fails or reopens and a further fix for it is dispatched. A different failing behavior gets its own ID and count. Never reset a count by renaming the finding. Tool retries, research, evidence-only requests and formatting carry no repair increment.
-4. For UI tasks, the default limit is three repairs **per defect**. Before dispatching a repair above the limit, use the orchestrator's `loop.limit_reached` procedure. Stop early if the same finding is accepted in two consecutive rounds, the same verification check fails in two consecutive rounds, or a permission, environment or requirement blocker appears. Track a failing check by its individual assertion or scenario when a suite reports multiple results. A newly failing pointer check starts its own history after a keyboard check passes.
-5. At arbitration update the task's per-defect ledger and next batch, then update `STATE.md`, `CONTEXT.md` and lifecycle events. Close under the ordinary review and verification gates, with current-round evidence for each required platform and outstanding optional checks clearly identified.
+A round keeps the standard structure and files: executor run, verification, review, arbitration.
+
+**Batching.** Each round fixes every open in-scope defect that can be fixed together in the same task worktree.
+
+**Verification tiers.**
+
+| Tier | When | Contents |
+| --- | --- | --- |
+| T1 | Every round | Static analysis, the full automated test suite, and real-input checks for this round's defects. |
+| T2 | At every checkpoint, after the first round that fixes a defect, and before close | T1, plus the build, the project's end-to-end runs, and a sweep of the whole interaction matrix. |
+
+Every round needs its own passing evidence; T1 is the minimum. Close needs T2 PASS in the final round. The T2 sweep after the first fixing round exists to find derived defects together, instead of one per round.
+
+**Repair count.**
+
+- A defect's count starts at 1 when its first fix is dispatched.
+- The count increases by 1 only when the same acceptance check still fails, or the defect reopens, and another fix for it is dispatched.
+- A different failing behavior gets its own ID, linked to its parent, and its own count starting at 1. Renaming a finding never resets a count.
+- No increment for: a re-dispatch in the same round after `NEEDS_CLARIFICATION`, a tool retry, research, an evidence-only request, or a formatting-only change.
+
+**Severity and deferral.**
+
+- P0-P2 defects inside the task's scope are fixed in this task.
+- A P3 defect is fixed when it is in the same component and fits the current batch. Otherwise the orchestrator may defer it as an A3 ruling, recorded as a `deferred` UD row.
+- The handoff lists every deferred defect with its UD-ID.
+
+**Checkpoint.** Hold one every N rounds (the grant's interval, default 3), or earlier when no P0-P2 defect is open:
+
+1. Run T2.
+2. Review the defect ledger: close fixed defects, defer P3 defects under the rule above, and choose the next batch.
+3. Record the checkpoint ruling as a UD row and append a `ui.checkpoint` event.
+4. Continue without human approval unless a stop condition applies.
+
+**Stop conditions.** Set the task to `BLOCKED`, append `loop.limit_reached`, and ask the human owner when:
+
+- the next fix for a defect would exceed its repair limit (default 3 per defect);
+- the same assertion fails with the same evidence in two consecutive rounds, which means no progress (when a suite reports several results, track each assertion or scenario separately);
+- a permission, environment or requirement blocker appears.
+
+A pending B question blocks only the work that depends on it. The standard `Max Rounds` limit and the standard rule "the same finding is accepted in two consecutive rounds" do not apply to UI tasks: a derived defect is progress, not repetition, and a defect that keeps failing is caught by its own repair count.
+
+**Close.**
+
+1. The final round has T2 PASS, and a review that is PASS or has every finding arbitrated as non-blocking, with current evidence for every required platform.
+2. Give the human owner the human-only checklist once, at close or at a checkpoint. Each item has steps, the expected result, and what happens on the next user action. Record the answers as UD rows. Optional platforms without evidence are reported as `NOT RUN`.
+3. The handoff lists the deferred defects, the outstanding optional checks, and the UD-IDs of this delivery.
+
+## Knowledge
+
+- Reusable interaction rules that do not depend on a framework go to [interaction-patterns.md](skills/ux-autopilot/references/interaction-patterns.md).
+- Framework- or project-specific notes stay in the project's `RUNBOOK.md` or `MEMORY.md`.
+- Each confirmed defect links to its regression test in the task's defect ledger.

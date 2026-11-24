@@ -1,8 +1,11 @@
 # UI decisions
 
-Append UI grants, design and interaction rulings, arbitration and pending questions here. Assign the next unique `UI-####` in the control worktree. Record who actually made the decision. For a human answer or a reversal, append a new row referring to the earlier ID; preserve history.
+Append-only ledger for the [UI policy](UI-POLICY.md). Record here: UI grants, every UI ruling and UI arbitration, pending UI questions, checkpoint rulings, deferrals, human overrides, and the results of human-only checks. General governance stays in `DECISIONS.md` and points back to these IDs.
 
-| UI-ID | Date | Task / defect | Platform | Grant / A1-A4 / B | Decider | Ruling or open question | Basis / evidence | Rollback / supersedes | Status |
+- Take the next unique `UD-####` in the control worktree.
+- Record who actually decided: `HUMAN_OWNER` or `ORCHESTRATOR`.
+- To answer, reverse or supersede a row, append a new row that names the earlier ID. Never edit an earlier row.
+- Status is `pending`, `accepted`, `deferred` or `rejected`. A pending question is owned by the orchestrator until the human owner answers it.
+
+| UD-ID | Date | Task / defect | Platform | Grant / A1-A4 / B | Decider | Ruling or open question | Basis / evidence | Rollback / supersedes | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-
-Use `pending`, `accepted`, `deferred` or `rejected`. A pending question is owned by the orchestrator until the human responds. Point general governance records and handoff notes back to these IDs. See [UI policy](UI-POLICY.md).

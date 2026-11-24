@@ -97,7 +97,7 @@ Questions asked during intake and the human owner's answers (see `INTAKE.md`).
 
 ## UI delegation (when applicable)
 
-[Grant UI-ID; design baseline; target platforms and inputs; platforms required to close; delegated design surfaces and writer.]
+[Grant UD-ID; design baseline; target platforms and inputs; platforms required to close; delegated design surfaces and writer; OS-level input permission and notification; human-only checks; checkpoint interval. See `UI-POLICY.md` "Grant".]
 
 ## Inputs
 

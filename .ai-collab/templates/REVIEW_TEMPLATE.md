@@ -38,7 +38,7 @@ Review for:
 - Missing verification
 - Unexplained diff
 
-For UI reviews, cite the stable defect ID (or identify a distinct new finding), affected platform, precondition, action, expected next outcome and evidence type. Include the applicable UI-ID and the verification artifact.
+For UI reviews, cite the stable defect ID (or identify a distinct new finding), affected platform, precondition, action, expected next outcome and evidence type. Include the applicable UD-ID and the verification artifact.
 
 ## Findings
 

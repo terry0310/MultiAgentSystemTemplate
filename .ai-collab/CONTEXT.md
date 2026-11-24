@@ -12,7 +12,7 @@ NO ACTIVE JOB.
 
 ## Key Decisions
 
-NO ACTIVE JOB. Historical UI rulings belong in `UI-DECISIONS.md`; general decisions belong in `DECISIONS.md`. Record UI-ID pointers in this digest.
+NO ACTIVE JOB. Historical UI rulings belong in `UI-DECISIONS.md`; general decisions belong in `DECISIONS.md`. Record UD-ID pointers in this digest.
 
 ## Environment Gotchas
 
@@ -30,5 +30,5 @@ NO ACTIVE JOB.
 | Resume after interruption | `STATE.md` + this file + recent events |
 | Take an acceptance-phase bug/feature request | This file + `JOB.md` Acceptance Criteria section |
 | Dispatch or arbitrate the active task | The active task file + its latest report/review/verify |
-| Resume a UI batch | Active task ledger (stable defect IDs and counts), related UI-IDs in `UI-DECISIONS.md`, latest verification and next action in `STATE.md` |
+| Resume a UI batch | Active task ledger (stable defect IDs and counts), related UD-IDs in `UI-DECISIONS.md`, latest verification and next action in `STATE.md` |
 | Tool commands for this machine | `RUNBOOK.md` |

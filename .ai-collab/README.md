@@ -77,7 +77,7 @@ worktrees inside one job), not at the job level.
 10. Orchestrator performs a close check and writes final handoff in `handoff/`.
 11. Human owner accepts or rejects the final result.
 
-For design and interaction work the human can authorize the [UI workflow](UI-POLICY.md) at intake. Use the normal task worktree and round reports. The task ledger tracks individual defects; the UI ledger is shared across tasks.
+For design and interaction work the human can authorize the [UI workflow](UI-POLICY.md) at intake. Use the normal task worktree and round reports. The task ledger tracks individual defects and their repair counts; the UI ledger is shared across tasks. Instead of a round limit, a UI task has a checkpoint every few rounds (default 3) where the orchestrator runs the full verification tier (T2) and the interaction-matrix sweep, then closes, defers or continues on its own.
 
 ## Complete Workflow
 
@@ -319,6 +319,7 @@ Recommended event types:
 - `agent.retry`
 - `agent.denied`
 - `loop.limit_reached`
+- `ui.checkpoint`
 
 ## Conflict Handling
 

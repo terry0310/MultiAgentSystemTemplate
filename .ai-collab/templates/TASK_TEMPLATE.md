@@ -29,7 +29,7 @@ TODO / ASSIGNED / RUNNING / RESUMING / BLOCKED / REPORT_READY / REVIEW_PENDING /
 
 ## Max Rounds
 
-<!-- Standard workflow only. UI tasks use the repair limit and checkpoint below. -->
+<!-- Standard workflow only. UI tasks use the per-defect repair limit and checkpoints below. -->
 
 3
 
@@ -37,13 +37,16 @@ TODO / ASSIGNED / RUNNING / RESUMING / BLOCKED / REPORT_READY / REVIEW_PENDING /
 
 Standard (default). For an approved UI task, select `UI` and fill the following before dispatch:
 
-- Grant UI-ID, baseline revision and design writer if applicable:
-- Target platforms / inputs and required evidence:
-- Repair limit per defect (default 3), authorized task budget, and checkpoint:
+- Grant UD-ID, baseline revision, and design writer if any:
+- Target platforms and inputs; required and optional platforms; human-only checks:
+- State and transition inventory and interaction matrix (path):
+- Repair limit per defect (default 3) and checkpoint interval (default 3 rounds):
+- Verification commands, T1 (every round) and T2 (checkpoints and close):
+- Tier for the current round (T1 or T2):
 - Defect ledger (update at each arbitration and fix dispatch):
 
-| Defect ID | Parent / finding | Platform, precondition, input and expected next action | Repair count | Round / status / evidence | UI-ID |
-| --- | --- | --- | --- | --- | --- |
+| Defect ID | Parent / finding | Severity | Platform, precondition, input and expected next action | Repair count | Round / status / evidence | Regression test | UD-ID |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
 List `ux-autopilot` and the relevant design skills in the appropriate dispatch contracts. See [UI policy](../UI-POLICY.md).
 

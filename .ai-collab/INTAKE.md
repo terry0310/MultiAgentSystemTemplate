@@ -68,7 +68,7 @@ Rules:
 - Record questions and answers in the `Intake Q&A` section of `JOB.md`.
   Answers are `[stated]` provenance.
 
-For UI work, confirm one grant with the job: the product goal, design baseline, target platforms and inputs, required platforms for acceptance, delegated choices and editable design files. Apply [UI-POLICY.md](UI-POLICY.md), log the human grant in [UI-DECISIONS.md](UI-DECISIONS.md), and cite its ID in the job. Seek clarification later only for choices outside the grant. A job can contain both UI and standard tasks.
+For UI work, confirm one grant with the job, using the fields in [UI-POLICY.md](UI-POLICY.md) "Grant": the product goal, design baseline, target platforms and inputs, required platforms for acceptance, delegated choices, editable design files and their writer, whether agents may send OS-level input on the operator's machine (and whether to notify first), the human-only checks, and the checkpoint interval. Apply [UI-POLICY.md](UI-POLICY.md), log the human grant in [UI-DECISIONS.md](UI-DECISIONS.md), and cite its ID in the job. Seek clarification later only for choices outside the grant. A job can contain both UI and standard tasks.
 
 ### Step 3b: Resolve Role Assignment
 

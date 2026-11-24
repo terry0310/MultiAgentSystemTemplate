@@ -4,7 +4,7 @@ This file records durable decisions.
 Do not delete prior decisions.
 Append new decisions with timestamps.
 
-Record general project governance and review arbitration here. Record all UI choices, open UI questions and UI arbitration in [UI-DECISIONS.md](UI-DECISIONS.md). When a UI decision also needs a scope, risk or permission approval, record only the governance approval and its related UI-ID here.
+Record general project governance and review arbitration here. Record all UI choices, open UI questions and UI arbitration in [UI-DECISIONS.md](UI-DECISIONS.md). When a UI decision also needs a scope, risk or permission approval, record only the governance approval and its related UD-ID here.
 
 ## Decision Log
 

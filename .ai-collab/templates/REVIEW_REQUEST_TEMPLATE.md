@@ -50,7 +50,7 @@ error handling on the new endpoint, migration rollback path, boundary
 conditions on the parser. Keep this concrete; "review everything" wastes
 the reviewer.]
 
-For UI batches, include the current defect IDs, UI-IDs, applicable skills, input sequences, build and evidence paths. Identify the interaction or state transition requiring independent review. For a text-only reviewer, supply the actual skill instructions, applicable UI rows and revision-specific verification evidence in the input it will receive. If the adapter cannot deliver the required contents or inspect necessary visual evidence, assign a reviewer that can access them.
+For UI batches, include the current defect IDs, UD-IDs, applicable skills, input sequences, build and evidence paths. Identify the interaction or state transition requiring independent review. For a text-only reviewer, supply the actual skill instructions, applicable UI rows and revision-specific verification evidence in the input it will receive. If the adapter cannot deliver the required contents or inspect necessary visual evidence, assign a reviewer that can access them.
 
 ## Known Concerns
 
