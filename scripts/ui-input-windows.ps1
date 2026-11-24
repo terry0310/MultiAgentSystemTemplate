@@ -36,7 +36,9 @@
 #   shot:name              save a PNG of the target view to <OutDir>\<name>.png
 #
 # Safety rules enforced here:
-#   - every input step requires the target window to be the foreground window, otherwise ABORT;
+#   - every native input submission requires the target window to be the foreground window, otherwise ABORT
+#     (checked again for each repeated key, each typevk character and each step of a multi-step move);
+#   - activate falls back to clicking the target's caption only when the target owns the window at that point;
 #   - mouse buttons and wheel require the cursor to be inside the target view;
 #   - screenshots cover the target view only and are written under -OutRoot only;
 #   - more than one running instance of the target process is an ABORT;
@@ -83,6 +85,8 @@ public static class UiInputNative {
   [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr h);
   [DllImport("user32.dll")] public static extern uint MapVirtualKey(uint code, uint mapType);
   [DllImport("user32.dll")] public static extern int GetSystemMetrics(int index);
+  [DllImport("user32.dll")] public static extern IntPtr WindowFromPoint(POINT p);
+  [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr h, uint flags);
   [DllImport("user32.dll", SetLastError = true)] static extern uint SendInput(uint n, INPUT[] inputs, int size);
 
   static uint Send(INPUT[] inputs) { return SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT))); }
@@ -243,6 +247,8 @@ function Move-Cursor($w, [int]$x, [int]$y, [int]$n) {
   for ($i = 1; $i -le $n; $i++) {
     $ix = [int][Math]::Round($c[0] + ($x - $c[0]) * $i / $n)
     $iy = [int][Math]::Round($c[1] + ($y - $c[1]) * $i / $n)
+    # Re-check before every submission: the operator may switch windows mid-move.
+    Assert-Foreground $w
     [void][UiInputNative]::MoveAbsolute($w.X + $ix, $w.Y + $iy)
     if ($n -gt 1) { Start-Sleep -Milliseconds 12 }
   }
@@ -319,12 +325,23 @@ function Invoke-Step([string]$step) {
       [void][UiInputNative]::SetForegroundWindow($w.Top)
       Start-Sleep -Milliseconds 250
       if ([UiInputNative]::GetForegroundWindow() -ne $w.Top) {
-        # Click the target window's own caption bar, above the client area.
+        # Click the target window's own caption bar, above the client area, but only when the
+        # window at that point belongs to the target; otherwise the click could reach another app.
         $wr = New-Object UiInputNative+RECT
         [void][UiInputNative]::GetWindowRect($w.Top, [ref]$wr)
         $cy = $wr.Top + [int](($w.Y - $wr.Top) / 2)
         if ($cy -ge $w.Y) { throw 'ABORT: no caption bar to click' }
-        [void][UiInputNative]::MoveAbsolute($wr.Left + 120, $cy)
+        $cx = $wr.Left + 120
+        if ($cx -ge $wr.Right) { throw 'ABORT: window too narrow for a caption click' }
+        $hit = New-Object UiInputNative+POINT
+        $hit.X = $cx
+        $hit.Y = $cy
+        $under = [UiInputNative]::WindowFromPoint($hit)
+        # 2 = GA_ROOT: the top-level window that owns the window under the point.
+        if ($under -eq [IntPtr]::Zero -or [UiInputNative]::GetAncestor($under, 2) -ne $w.Top) {
+          throw "ABORT: activation failed and the caption point is covered by another window (not clicked)"
+        }
+        [void][UiInputNative]::MoveAbsolute($cx, $cy)
         [void][UiInputNative]::MouseButton($true)
         [void][UiInputNative]::MouseButton($false)
         Start-Sleep -Milliseconds 250
@@ -436,6 +453,7 @@ function Invoke-Step([string]$step) {
       $count = 1
       if ($countText) { $count = [int]$countText }
       for ($i = 0; $i -lt $count; $i++) {
+        Assert-Foreground $w
         switch ($keyName) {
           'ShiftTab' { [void][UiInputNative]::Chord([uint16[]]@(0x10), [uint16]0x09) }
           'CtrlA' { [void][UiInputNative]::Chord([uint16[]]@(0x11), [uint16]0x41) }
@@ -459,6 +477,7 @@ function Invoke-Step([string]$step) {
       Assert-Foreground $w
       if ($arg -notmatch '^[A-Za-z0-9 ]+$') { throw 'ABORT: typevk accepts letters, digits and spaces only' }
       foreach ($ch in $arg.ToCharArray()) {
+        Assert-Foreground $w
         $vk = [uint16][char]::ToUpperInvariant($ch)
         if ([char]::IsUpper($ch)) { [void][UiInputNative]::Chord([uint16[]]@(0x10), $vk) }
         else { [void][UiInputNative]::Chord([uint16[]]@(), $vk) }

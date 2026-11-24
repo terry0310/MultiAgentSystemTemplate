@@ -45,7 +45,7 @@ Machine-specific details belong in `RUNBOOK.md`; job-specific history belongs in
 
 - Symptom: after an outside click dismisses a popup, the input has focus but all of its text is selected, so the next keystroke replaces it. Tests that assert only "has focus" pass.
 - Root cause: the input lost focus on pointer-down and code gave it back on release; some desktop platforms select all text when an input gains focus.
-- Solution: keep the input from losing focus in the first place (put the related area in the input's focus or tap group) instead of restoring it afterwards. After every dismissal, type one more character and assert the caret, the selection and the text (`skills/ux-autopilot/references/interaction-patterns.md` IP-005).
+- Solution: keep the input from losing focus in the first place (put the related area in the input's focus or tap group) instead of restoring it afterwards. After every dismissal that keeps the user in the input (Esc, a press outside), type one more character and assert the caret, the selection and the text (`skills/ux-autopilot/references/interaction-patterns.md` IP-005).
 - Source: UI workflow trial in a desktop app project, 2026-11-24; found by real OS-level input, not by widget tests.
 
 ## Entry Template

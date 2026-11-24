@@ -29,11 +29,11 @@ Use these rules as A1 or A2 evidence only when the project has adopted them or t
 - **Sources.** Autocomplete widgets that show options only while the field has focus; the Windows auto-suggest box; WAI-ARIA Authoring Practices.
 - **Test.** Use a controlled delay. Move focus while the result is pending, then release the result: the popup stays hidden. A real-device test usually cannot hit this window; say so in the evidence.
 
-## IP-005 Every dismissal leaves the input in the same state
+## IP-005 Dismissals that keep the user in the input leave it in the same state
 
-- **Rule.** Esc, an outside click and every other dismissal leave the focus, the caret position and the selection exactly as they were, so the user can keep typing.
+- **Rule.** Dismissals meant to keep the user in the input, such as Esc and a press outside the popup, leave the focus, the caret position and the selection exactly as they were, so the user can keep typing. Focus navigation is different: Tab and Shift+Tab move focus as described in IP-002.
 - **Why.** On some desktop platforms an input that loses focus and gets it back selects all its text, so the next keystroke replaces the whole input. Asserting only "the input has focus" misses this.
-- **Test.** Dismiss in each way, then type one more character. Compare the caret, the selection and the text across all dismissal methods and on each target platform.
+- **Test.** Dismiss in each of these ways, then type one more character. Compare the caret, the selection and the text across those dismissal methods and on each target platform.
 
 ## IP-006 Stacked popups close from the top down
 
