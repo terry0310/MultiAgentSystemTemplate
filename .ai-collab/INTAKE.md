@@ -68,6 +68,8 @@ Rules:
 - Record questions and answers in the `Intake Q&A` section of `JOB.md`.
   Answers are `[stated]` provenance.
 
+For UI work, confirm one grant with the job: the product goal, design baseline, target platforms and inputs, required platforms for acceptance, delegated choices and editable design files. Apply [UI-POLICY.md](UI-POLICY.md), log the human grant in [UI-DECISIONS.md](UI-DECISIONS.md), and cite its ID in the job. Seek clarification later only for choices outside the grant. A job can contain both UI and standard tasks.
+
 ### Step 3b: Resolve Role Assignment
 
 - Take the human's one-line assignment instruction or preset name; default to
@@ -127,7 +129,7 @@ amendment path is deliberately cheap:
 3. Distinguish bug from scope change: a bug (delivered behavior violates an
    existing criterion) needs no human confirmation to fix; a scope change
    (new behavior) needs a one-line confirmation and a `HUMAN_OWNER` decision
-   in `DECISIONS.md`.
+   in `DECISIONS.md`. For UI amendments, keep the behavior ruling in `UI-DECISIONS.md` and link its ID from the scope approval.
 4. Ask at most the questions the new criteria strictly need (the Step 3
    discipline applies; usually zero or one).
 5. Create the narrow follow-up task(s), update `CONTEXT.md` and `STATE.md`,

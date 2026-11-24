@@ -40,7 +40,9 @@ worktrees inside one job), not at the job level.
 | `CONTEXT.md` | Tier-0 job digest: one-line task ledger, decision summaries, pointers. Read this INSTEAD of the archive when resuming or amending. |
 | `MEMORY.md` | Cross-project lessons: recurring problems with proven fixes (symptom → root cause → solution → asset). Check when a symptom looks familiar; update at every retrospective. Travels with the template. |
 | `BOARD.md` | Task board for cross-agent status tracking. |
-| `DECISIONS.md` | Decision log and open decision requests. |
+| `DECISIONS.md` | General project decisions and approvals. |
+| [UI-POLICY.md](UI-POLICY.md) | Delegation, evidence and repair rules for opt-in UI tasks. |
+| [UI-DECISIONS.md](UI-DECISIONS.md) | UI rulings, pending questions and superseding decisions. |
 | `WORKTREES.md` | Worktree policy and active workspace registry. |
 | `ORCHESTRATOR_PROMPT.md` | Prompt contract for the orchestrator. |
 | `EXECUTOR_PROMPT.md` | Prompt contract for executors. |
@@ -70,10 +72,12 @@ worktrees inside one job), not at the job level.
 5. Executor writes a report in `reports/`.
 6. Verifier records objective checks in `verification/`.
 7. Reviewer writes findings in `reviews/`.
-8. Orchestrator arbitrates findings and records decisions in `DECISIONS.md`.
+8. Orchestrator arbitrates findings. UI rulings go to `UI-DECISIONS.md`; other decisions go to `DECISIONS.md`.
 9. Valid findings inside the task's scope become the next round of the same task (`ORCHESTRATOR_PROMPT.md` "Fix Loop"); other valid work becomes a new narrow task.
 10. Orchestrator performs a close check and writes final handoff in `handoff/`.
 11. Human owner accepts or rejects the final result.
+
+For design and interaction work the human can authorize the [UI workflow](UI-POLICY.md) at intake. Use the normal task worktree and round reports. The task ledger tracks individual defects; the UI ledger is shared across tasks.
 
 ## Complete Workflow
 
@@ -109,7 +113,7 @@ worktrees inside one job), not at the job level.
 
 - Verifier runs objective checks from the executor worktree or from the main worktree after merge, depending on the task.
 - Verifier writes `verification/TASK-XXX-R<n>-VERIFY.md` (one file per round) from `templates/VERIFY_TEMPLATE.md`.
-- Unexecuted checks must remain `NOT RUN`; failed checks must include relevant logs or log paths.
+- Mark unexecuted optional checks `NOT RUN`. If a required check cannot execute, record `BLOCKED` with the cause. Include relevant evidence for each failure.
 - Append `verification.passed`, `verification.failed`, or another specific verification event.
 
 ### 5. Review
@@ -123,11 +127,11 @@ worktrees inside one job), not at the job level.
 
 ### 6. Arbitration And Fix Loop
 
-- Orchestrator records decisions in `DECISIONS.md` for every reviewer finding.
+- Record each UI finding's ruling in `UI-DECISIONS.md` and each general ruling in `DECISIONS.md`.
 - Valid bugs or required test gaps inside the task's scope become the next round of the same task: a `## Round <n+1>` section in the task file, on the same branch and worktree.
 - Valid work outside the task's scope becomes a new narrow task, with human owner approval when it expands the job's scope.
 - False positives, style-only items, out-of-scope findings, or deferred risks are recorded with reasons.
-- Human owner decides product behavior, scope expansion, and risk acceptance.
+- Human owner retains final product acceptance and rules on scope and risk. For tasks marked `UI`, the orchestrator can decide details within the confirmed [UI grant](UI-POLICY.md).
 - Repeat executor, verification, review, and arbitration until close criteria are met or the job is blocked, within the round limit and stop conditions of "Fix Loop" in `ORCHESTRATOR_PROMPT.md`.
 
 ### 7. Close Check
@@ -320,7 +324,7 @@ Recommended event types:
 
 When files, decisions, or task ownership conflict, follow `ASSIGNMENT.md`.
 If the conflict cannot be resolved there, escalate to `HUMAN_OWNER` and record the
-outcome in `DECISIONS.md`.
+outcome in the UI or general ledger according to the subject.
 
 ## Final Handoff
 

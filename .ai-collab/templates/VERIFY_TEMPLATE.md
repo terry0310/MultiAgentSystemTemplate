@@ -82,6 +82,13 @@ PASS / FAIL / NOT RUN
 
 PASS / FAIL / NOT RUN
 
+## UI checks (when applicable)
+
+| Defect / criterion | Build commit, platform and input | Precondition, action and next observable result | Evidence type / shared artifact | Required? | Result |
+| --- | --- | --- | --- | --- | --- |
+
+Record PASS, FAIL, BLOCKED or NOT RUN with a reason. Required checks that cannot execute block verification. Report simulated and real-device coverage separately.
+
 ## Unverified Items
 
 - [Item 1]

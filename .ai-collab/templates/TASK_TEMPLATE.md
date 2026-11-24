@@ -29,9 +29,23 @@ TODO / ASSIGNED / RUNNING / RESUMING / BLOCKED / REPORT_READY / REVIEW_PENDING /
 
 ## Max Rounds
 
-<!-- Fix-loop limit (ORCHESTRATOR_PROMPT.md "Fix Loop"). -->
+<!-- Standard workflow only. UI tasks use the repair limit and checkpoint below. -->
 
 3
+
+## Workflow
+
+Standard (default). For an approved UI task, select `UI` and fill the following before dispatch:
+
+- Grant UI-ID, baseline revision and design writer if applicable:
+- Target platforms / inputs and required evidence:
+- Repair limit per defect (default 3), authorized task budget, and checkpoint:
+- Defect ledger (update at each arbitration and fix dispatch):
+
+| Defect ID | Parent / finding | Platform, precondition, input and expected next action | Repair count | Round / status / evidence | UI-ID |
+| --- | --- | --- | --- | --- | --- |
+
+List `ux-autopilot` and the relevant design skills in the appropriate dispatch contracts. See [UI policy](../UI-POLICY.md).
 
 ## Branch
 

@@ -68,7 +68,7 @@ other value needs human owner approval recorded in `DECISIONS.md`.
 7. If overlapping file changes are discovered after executor work starts, pause affected tasks and arbitrate from branch diffs.
 8. If review and verification disagree, `ORCHESTRATOR` decides whether to request more evidence.
 9. If scope changes, only `HUMAN_OWNER` can approve the change.
-10. All accepted conflict resolutions must be recorded in `DECISIONS.md`.
+10. Record UI rulings in `UI-DECISIONS.md` and general conflict resolutions in `DECISIONS.md`. For an authorized UI task, assign research, UX QA and real-app interaction checks to capable agents under the existing roles. The orchestrator arbitrates, the reviewer remains independent where available, and the verifier owns the reported checks.
 
 ## Multi-Agent Worktree Policy
 

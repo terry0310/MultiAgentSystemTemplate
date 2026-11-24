@@ -39,6 +39,12 @@ Record shell, filesystem, encoding, sandbox, dependency, browser, or CI constrai
 | State and events | `README.md` | Edit files directly; never keep state only in chat. |
 | Permission denial | `ORCHESTRATOR_PROMPT.md` "Permission Denials" | See "Permission Denials (Claude Code)" below. |
 
+## UI verification tools
+
+At planning, bind the task's target platform and input methods to available runners and record the commands, artifact destination, and operator in the contract. An OS-input check needs an authorized target window or device. For a design file, record its baseline revision and designated writer. Bind these capabilities from the current assignment and environment.
+
+Use `verification/` for the round report. Give evidence a repository-relative tracked path or a shared artifact reference that another machine can resolve, with the build commit and a relevant excerpt. Keep private captures and large logs in an approved store. If an optional device is unavailable, record `NOT RUN`; if a required check cannot execute, record `BLOCKED` and its reason. Human risk acceptance follows the usual governance route.
+
 ## Dispatch Patterns
 
 ### Same-Session Subagent

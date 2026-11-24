@@ -144,9 +144,9 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 11. Arbitrate every reviewer finding.
 12. Turn valid in-scope findings into the next round of the same task (see
     "Fix Loop"); open new tasks only for valid work outside the task's scope.
-13. Maintain `STATE.md`, `BOARD.md`, `DECISIONS.md`, and `events.ndjson`.
+13. Maintain `STATE.md`, `BOARD.md`, the applicable decision ledger and `events.ndjson`.
 14. Perform close check before declaring ready.
-15. Escalate product behavior and risk decisions to Human Owner.
+15. Apply [UI-POLICY.md](UI-POLICY.md) to delegated UI details. Escalate other product behavior and risk decisions to Human Owner.
 
 ## Hard Rules
 
@@ -195,7 +195,7 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 - Require executor reports in `reports/`.
 - Require review notes in `reviews/`.
 - Require verification evidence in `verification/`.
-- Record decisions in `DECISIONS.md`.
+- Record UI decisions only in `UI-DECISIONS.md`. Use `DECISIONS.md` for general governance.
 - Append important lifecycle events to `events.ndjson` as valid JSON lines.
 - Write final handoff in `handoff/`.
 
@@ -260,17 +260,17 @@ A round is: executor run → verification → review → arbitration. Each round
 keeps its own files: `reports/TASK-XXX-R<n>-EXECUTOR-REPORT.md`,
 `verification/TASK-XXX-R<n>-VERIFY.md`,
 `reviews/TASK-XXX-R<n>-REVIEW-REQUEST.md`, `reviews/TASK-XXX-R<n>-REVIEW.md`,
-and the arbitration entries in `DECISIONS.md`.
+and arbitration entries in the appropriate decision ledger. On UI tasks read the grant and open defects at recovery, then apply the [UI repair loop](UI-POLICY.md#ui-repair-loop) to batch compatible repairs. Preserve all non-limit stop conditions below.
 
 - After arbitration, accepted findings that stay inside the task's scope
   become a new `## Round <n+1>` section at the end of the task file (the
   findings are its acceptance criteria), and the next round is dispatched
   without waiting for the human owner.
-- A finding that needs a product, scope, or risk decision goes to the human
-  owner before the next round.
+- For UI tasks the orchestrator arbitrates A1-A4, logs the UI-ID and updates the contract. Send B decisions to the human owner before dispatching affected work. Other tasks follow the ordinary product, scope and risk escalation.
 - Stop, set the task to `BLOCKED`, append `loop.limit_reached`, and ask the
   human owner when:
-  - the next round would exceed the task's `Max Rounds` (default 3);
+  - standard task: the next round would exceed `Max Rounds` (default 3);
+  - UI task: the next repair for a defect would exceed its repair limit (default 3), or the authorized task budget is exhausted with required repairs outstanding;
   - the same finding is accepted in two consecutive rounds;
   - the same verification check fails in two consecutive rounds;
   - a permission, environment, or requirement blocker appears.
