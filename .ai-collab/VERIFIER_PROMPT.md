@@ -16,9 +16,12 @@ actually pass when actually run.
 
 ## Rules
 
-- Run the declared checks exactly as written. If a command cannot run
-  (missing dependency, wrong environment), the result is `BLOCKED` with the
-  error output — not `NOT RUN`, and never `PASS`.
+- Run the declared checks exactly as written. If a command cannot run, record
+  `BLOCKED` and the reason or error output. On a UI task, when the approved
+  grant marks a platform or device check optional and its environment is
+  unavailable, record `NOT RUN` and the missing capability. The required
+  checks determine whether verification can pass. Report any observed
+  failure for arbitration even on an optional platform.
 - `PASS` means: you ran it, in this session, and saw it succeed. There is no
   other path to `PASS`. Executor claims, cached results, and "it obviously
   works" do not count.

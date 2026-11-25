@@ -43,7 +43,7 @@ Any available agent may be assigned to any role in `ASSIGNMENT.md`.
 - Request reviews.
 - Arbitrate reviewer findings.
 - Decide whether to open follow-up tasks.
-- Escalate product decisions to `HUMAN_OWNER`.
+- Decide delegated UI details under [UI-POLICY.md](UI-POLICY.md). Escalate other product decisions to `HUMAN_OWNER`.
 - Perform close checks.
 - Produce final handoff or delegate handoff drafting to `SCRIBE`.
 
@@ -197,7 +197,7 @@ Each finding must include:
 
 - Maintain state files.
 - Update task board.
-- Record decisions in `DECISIONS.md`.
+- Record UI rulings in `UI-DECISIONS.md` and general decisions in `DECISIONS.md`.
 - Compress context into durable notes.
 - Maintain handoff documents.
 - Append valid events to `events.ndjson`.

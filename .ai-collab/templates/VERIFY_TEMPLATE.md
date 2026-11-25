@@ -82,6 +82,19 @@ PASS / FAIL / NOT RUN
 
 PASS / FAIL / NOT RUN
 
+## UI checks (when applicable)
+
+Tier: T1 / T2 (see `UI-POLICY.md` "UI repair loop").
+
+| Defect / criterion | Build commit, platform and input | Precondition, action and next observable result | Evidence type / shared artifact | Required? | Result |
+| --- | --- | --- | --- | --- | --- |
+
+Record PASS, FAIL, BLOCKED or NOT RUN with a reason. Required checks that cannot execute block verification. Report simulated and real-device coverage separately.
+
+For T2, also report the interaction-matrix sweep: cells run, cells failed (with defect IDs), cells not applicable.
+
+Human-only checks (for example IME, touch, screen reader) are not judged by agents. List the outstanding ones here for the orchestrator to hand to the human owner.
+
 ## Unverified Items
 
 - [Item 1]

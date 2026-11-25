@@ -50,6 +50,8 @@ DONE / PARTIALLY_DONE / BLOCKED / CANCELLED
 - [Decision 1]
 - [Decision 2]
 
+For UI work, cite the grant and this delivery's UD-IDs, including pending human decisions. List the verified build, results by target platform, remaining device checks, and their effect on acceptance.
+
 ## Remaining Risks
 
 - [Risk 1]

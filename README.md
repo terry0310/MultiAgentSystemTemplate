@@ -58,6 +58,8 @@ step lost.
    nothing and you get `solo`. See
    [`AGENT_REGISTRY.md`](.ai-collab/AGENT_REGISTRY.md).
 
+For design and interaction tasks, authorize the [UI workflow](.ai-collab/UI-POLICY.md) at intake. It uses the existing roles and worktrees, a shared [UI decision ledger](.ai-collab/UI-DECISIONS.md) with `UD-####` IDs, repair counts for individual defects, and a checkpoint every few rounds instead of a round limit.
+
 ## Bridging Different Agents
 
 | Tier | What | How it joins |

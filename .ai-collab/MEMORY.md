@@ -34,6 +34,20 @@ Machine-specific details belong in `RUNBOOK.md`; job-specific history belongs in
 - Solution: add `--disable plugins --disable apps` (`RUNBOOK.md` "Codex CLI Binding") and limit skills through the task contract.
 - Source: configuration probes E0, E1, E2 and E7, 2026-11-19.
 
+### M-004 UI tests pass with the harness's default input kind but the real app fails
+
+- Symptom: new UI tests pass, but in the real desktop app pressing a suggestion row closes the list before the click lands, so a mouse cannot select anything.
+- Root cause: the test harness defaulted to a mobile platform with touch input and no frame between pointer down and up. On desktop, a text input loses focus at pointer-down outside it, a path the default tests never take.
+- Solution: select the target platform and the input kind explicitly in UI tests, split pointer down, a frame and pointer up when timing matters, and add a real-input sweep at T2 (`UI-POLICY.md`, `skills/ux-autopilot/testing.md`).
+- Source: UI workflow trial in a desktop app project, 2026-11-24.
+
+### M-005 "Has focus" is not the same as "kept focus"
+
+- Symptom: after an outside click dismisses a popup, the input has focus but all of its text is selected, so the next keystroke replaces it. Tests that assert only "has focus" pass.
+- Root cause: the input lost focus on pointer-down and code gave it back on release; some desktop platforms select all text when an input gains focus.
+- Solution: keep the input from losing focus in the first place (put the related area in the input's focus or tap group) instead of restoring it afterwards. After every dismissal that keeps the user in the input (Esc, a press outside), type one more character and assert the caret, the selection and the text (`skills/ux-autopilot/references/interaction-patterns.md` IP-005).
+- Source: UI workflow trial in a desktop app project, 2026-11-24; found by real OS-level input, not by widget tests.
+
 ## Entry Template
 
 ### M-001 [Short Title]

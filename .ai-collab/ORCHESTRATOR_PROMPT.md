@@ -144,9 +144,9 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 11. Arbitrate every reviewer finding.
 12. Turn valid in-scope findings into the next round of the same task (see
     "Fix Loop"); open new tasks only for valid work outside the task's scope.
-13. Maintain `STATE.md`, `BOARD.md`, `DECISIONS.md`, and `events.ndjson`.
+13. Maintain `STATE.md`, `BOARD.md`, the applicable decision ledger and `events.ndjson`.
 14. Perform close check before declaring ready.
-15. Escalate product behavior and risk decisions to Human Owner.
+15. Apply [UI-POLICY.md](UI-POLICY.md) to delegated UI details. Escalate other product behavior and risk decisions to Human Owner.
 
 ## Hard Rules
 
@@ -195,7 +195,7 @@ per turn — see `README.md` "Tiered Reading" and MEMORY.md M-008). Therefore:
 - Require executor reports in `reports/`.
 - Require review notes in `reviews/`.
 - Require verification evidence in `verification/`.
-- Record decisions in `DECISIONS.md`.
+- Record UI decisions only in `UI-DECISIONS.md`. Use `DECISIONS.md` for general governance.
 - Append important lifecycle events to `events.ndjson` as valid JSON lines.
 - Write final handoff in `handoff/`.
 
@@ -260,23 +260,32 @@ A round is: executor run → verification → review → arbitration. Each round
 keeps its own files: `reports/TASK-XXX-R<n>-EXECUTOR-REPORT.md`,
 `verification/TASK-XXX-R<n>-VERIFY.md`,
 `reviews/TASK-XXX-R<n>-REVIEW-REQUEST.md`, `reviews/TASK-XXX-R<n>-REVIEW.md`,
-and the arbitration entries in `DECISIONS.md`.
+and arbitration entries in the appropriate decision ledger (`UI-DECISIONS.md`
+for UI tasks, `DECISIONS.md` otherwise).
 
 - After arbitration, accepted findings that stay inside the task's scope
   become a new `## Round <n+1>` section at the end of the task file (the
   findings are its acceptance criteria), and the next round is dispatched
   without waiting for the human owner.
 - A finding that needs a product, scope, or risk decision goes to the human
-  owner before the next round.
-- Stop, set the task to `BLOCKED`, append `loop.limit_reached`, and ask the
-  human owner when:
+  owner before the next round. On a UI task the orchestrator rules on A1-A4
+  items itself and sends only B items to the human owner.
+- Standard task: stop, set the task to `BLOCKED`, append
+  `loop.limit_reached`, and ask the human owner when:
   - the next round would exceed the task's `Max Rounds` (default 3);
   - the same finding is accepted in two consecutive rounds;
   - the same verification check fails in two consecutive rounds;
   - a permission, environment, or requirement blocker appears.
+- UI task: follow the [UI repair loop](UI-POLICY.md#ui-repair-loop) instead
+  of the rules above. It batches compatible defects, counts repairs per
+  defect, uses verification tiers T1 and T2 with a checkpoint every few
+  rounds, and stops when a defect's repair limit would be exceeded, when the
+  same assertion fails with the same evidence in two consecutive rounds, or
+  on a blocker. At recovery, read the grant and the task's defect ledger.
 - A task passes only with this round's verification `PASS` and a review that
   is `PASS` or has every finding arbitrated as non-blocking. Never mark a
-  result `PASS` without evidence from this round.
+  result `PASS` without evidence from this round. A UI task closes only with
+  T2 `PASS` in its final round.
 
 ## Permission Denials
 
@@ -300,6 +309,7 @@ Use these files as the source of truth. Do not invent a second format in chat.
 | Review request | `.ai-collab/templates/REVIEW_REQUEST_TEMPLATE.md` |
 | Review | `.ai-collab/templates/REVIEW_TEMPLATE.md` |
 | Verification | `.ai-collab/templates/VERIFY_TEMPLATE.md` |
+| UI research or interaction request | `.ai-collab/templates/UI_CHECK_REQUEST_TEMPLATE.md` |
 | Final handoff | `.ai-collab/templates/FINAL_HANDOFF_TEMPLATE.md` |
 
 ## Event Logging

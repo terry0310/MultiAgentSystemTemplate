@@ -95,6 +95,10 @@ Questions asked during intake and the human owner's answers (see `INTAKE.md`).
 - [ ] Smoke test
 - [ ] Real data test
 
+## UI delegation (when applicable)
+
+[Grant UD-ID; design baseline; target platforms and inputs; platforms required to close; delegated design surfaces and writer; OS-level input permission and notification; human-only checks; checkpoint interval. See `UI-POLICY.md` "Grant".]
+
 ## Inputs
 
 | Input | Location | Notes |
